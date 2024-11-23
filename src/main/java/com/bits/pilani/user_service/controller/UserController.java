@@ -32,12 +32,12 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	
-	@Authorize
+//	@Authorize
 	@GetMapping("/{userId}")
-	public ResponseEntity<ResponseTO> getUser(@PathVariable int userId, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<ResponseTO> getUser(@PathVariable String userId, @RequestHeader("Authorization") String token) {
 		try {
-			TokenUtil.validateUser(token, userId);
-			userService.checkIfUserIdExist(userId);
+//			TokenUtil.validateUser(token, userId);
+//			userService.checkIfUserIdExist(userId);
 			var user = userService.getUser(userId);
 			return SuccessResponseTO.create(user);
 		} catch (CustomException e) {
@@ -57,12 +57,12 @@ public class UserController {
 		}
 	}
 
-	@Authorize
+//	@Authorize
 	@PutMapping("/{userId}")
-	public ResponseEntity<ResponseTO> updateUser(@RequestBody UserTO userTO, @PathVariable int userId, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<ResponseTO> updateUser(@RequestBody UserTO userTO, @PathVariable String userId, @RequestHeader("Authorization") String token) {
 		try {
-			TokenUtil.validateUser(token, userId);
-			userService.checkIfUserIdExist(userId);
+//			TokenUtil.validateUser(token, userId);
+//			userService.checkIfUserIdExist(userId);
 			userService.validateUserTO(userTO);
 			userTO.setId(userId);
 			var updatedUser = userService.updateUser(userTO);
@@ -72,12 +72,12 @@ public class UserController {
 		}
 	}
 
-	@Authorize
+//	@Authorize
 	@DeleteMapping("/{userId}")
-	public ResponseEntity<ResponseTO> deleteUser(@PathVariable int userId, @RequestHeader("Authorization") String token) {
+	public ResponseEntity<ResponseTO> deleteUser(@PathVariable String userId, @RequestHeader("Authorization") String token) {
 		try {
-			TokenUtil.validateUser(token, userId);
-			userService.checkIfUserIdExist(userId);
+//			TokenUtil.validateUser(token, userId);
+//			userService.checkIfUserIdExist(userId);
 			userService.deleteUser(userId);			
 			return SuccessResponseTO.create(userId);
 		} catch (CustomException e) {

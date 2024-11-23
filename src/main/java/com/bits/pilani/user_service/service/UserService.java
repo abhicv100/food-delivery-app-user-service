@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,7 @@ public class UserService {
 	@Autowired
 	VehicleTypeDao vehicleTypeDao;
 
-	public UserTO getUser(int userId) throws CustomException {
+	public UserTO getUser(String userId) throws CustomException {
 
 		try {
 			UserTO userTO = new UserTO();
@@ -41,9 +42,9 @@ public class UserService {
 				String errorMsg = String.format("User id = '%s' is invalid", userId);
 				throw new CustomException(HttpStatus.BAD_REQUEST, errorMsg);
 			}
-			
+
 			userTO.setPassword(null);
-			
+
 			return userTO;
 		} catch (DataAccessException e) {
 			throw CustomException.INTERNAL_SERVER_ERRROR;
@@ -68,7 +69,7 @@ public class UserService {
 		return createUser(userTO);
 	}
 
-	public void deleteUser(int userId) throws CustomException {
+	public void deleteUser(String userId) throws CustomException {
 		try {
 			userDao.deleteById(userId);
 		} catch (DataAccessException e) {
@@ -93,7 +94,7 @@ public class UserService {
 		}
 	}
 
-	public void checkIfUserIdExist(int userId) throws CustomException {
+	public void checkIfUserIdExist(String userId) throws CustomException {
 		if (!userDao.existsById(userId)) {
 			String errorMsg = String.format("User id = '%s' is invalid", userId);
 			throw new CustomException(HttpStatus.BAD_REQUEST, errorMsg);
@@ -114,31 +115,23 @@ public class UserService {
 			throw new CustomException(HttpStatus.BAD_REQUEST, "Fullname is missing. Please provide fullname.");
 		}
 
-		if (Objects.isNull(userTo.getRoleId())) {
-			throw new CustomException(HttpStatus.BAD_REQUEST, "Role id is missing. Please provide rold id.");
+		if (Objects.isNull(userTo.getRole())) {
+			throw new CustomException(HttpStatus.BAD_REQUEST, "Role is missing. Please provide role.");
 		}
 
-		var mayBeRole = Role.findById(userTo.getRoleId());
-		if (mayBeRole.isEmpty()) {
-			String errorMsg = String.format("Role id  = '%s' is invalid.", userTo.getRoleId());
+		try {
+			var role = Role.valueOf(userTo.getRole());
+			if (role.equals(Role.CUSTOMER)) {
+				if (Objects.isNull(userTo.getAddress())) {
+					throw new CustomException(HttpStatus.BAD_REQUEST, "Address is missing. Please provide address.");
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			var supportedRoles = Arrays.asList(Role.values()).stream().map((role) -> role.name())
+					.collect(Collectors.joining(", "));
+			var errorMsg = String.format("Invalid role = '%s'. Supported roles: [%s]", userTo.getRole(),
+					supportedRoles);
 			throw new CustomException(HttpStatus.BAD_REQUEST, errorMsg);
-		}
-
-		if(mayBeRole.get().equals(Role.CUSTOMER)) {
-			userTo.setVehicleTypeId(null);
-			if(Objects.isNull(userTo.getAddress())) {
-				throw new CustomException(HttpStatus.BAD_REQUEST, "Address is missing. Please provide address.");
-			}
-		} else if(mayBeRole.get().equals(Role.DELIVERY_PERSONNEL)) {
-			if(!Objects.nonNull(userTo.getVehicleTypeId())) {
-				throw new CustomException(HttpStatus.BAD_REQUEST, "Vehicle type id is missing. Please provide vehicle type id");				
-			}
-			if(!vehicleTypeDao.existsById(userTo.getVehicleTypeId())) {
-				String errorMsg = String.format("Vehicle type id = '%s' is invalid", userTo.getVehicleTypeId());
-				throw new CustomException(HttpStatus.BAD_REQUEST, errorMsg);
-			}
-		} else if(mayBeRole.get().equals(Role.ADMIN) || mayBeRole.get().equals(Role.RESTAURANT_OWNER)) {
-			userTo.setVehicleTypeId(null);
 		}
 	}
 }

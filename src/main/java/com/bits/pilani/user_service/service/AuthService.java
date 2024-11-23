@@ -38,18 +38,12 @@ public class AuthService {
 			throw new CustomException(HttpStatus.UNAUTHORIZED, "Password is invalid");
 		}
 
-		var mayBeRole = Role.findById(userEntity.getRoleId());
-
-		if (mayBeRole.isPresent()) {
-			try {
-				String token = Jwts.builder().subject(usernamePasswordTO.getUsername())
-						.issuedAt(new Date(System.currentTimeMillis())).claim("userId", userEntity.getId())
-						.claim("role", mayBeRole.get().name()).signWith(secretKey).compact();
-				return token;
-			} catch (Exception e) {
-				throw CustomException.INTERNAL_SERVER_ERRROR;
-			}
-		} else {
+		try {
+			String token = Jwts.builder().subject(usernamePasswordTO.getUsername())
+					.issuedAt(new Date(System.currentTimeMillis())).claim("userId", userEntity.getId())
+					.claim("role", userEntity.getRole()).signWith(secretKey).compact();
+			return token;
+		} catch (Exception e) {
 			throw CustomException.INTERNAL_SERVER_ERRROR;
 		}
 	}
