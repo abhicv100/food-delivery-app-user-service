@@ -19,7 +19,7 @@ public class AuthController {
 	
 	@Autowired
 	AuthService authService;
-	
+
 	@GetMapping("/auth")
 	public ResponseEntity<ResponseTO> authenticateUser(@RequestBody UsernamePasswordTO usernamePasswordTO) {
 		try  {
