@@ -23,7 +23,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 		errorResponse.setMessage(exception.getMessage());
 		return ResponseEntity.internalServerError().body(errorResponse);
 	}
-
+ 
 	@ExceptionHandler(CustomException.class)
     public ResponseEntity<ResponseTO> handleCustomException(CustomException customException) {
         return CustomException.handleException(customException);
