@@ -2,6 +2,7 @@ package com.bits.pilani.user_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @SpringBootApplication(scanBasePackages = "com.bits.pilani")
 public class UserServiceApplication {

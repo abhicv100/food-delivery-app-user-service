@@ -12,22 +12,17 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import com.bits.pilani.user_service.dao.UserDao;
+import com.bits.pilani.user_service.entity.UserEntity;
 import com.bits.pilani.user_service.exception.CustomException;
 import com.bits.pilani.user_service.security.Role;
-import com.bits.pilani.user_service.dao.UserDao;
-import com.bits.pilani.user_service.dao.VehicleTypeDao;
-import com.bits.pilani.user_service.entity.UserEntity;
 import com.bits.pilani.user_service.to.UserTO;
-import com.bits.pilani.user_service.to.VehicleTypeTO;
 
 @Service
 public class UserService {
 
 	@Autowired
 	UserDao userDao;
-
-	@Autowired
-	VehicleTypeDao vehicleTypeDao;
 
 	public UserTO getUser(String userId) throws CustomException {
 
@@ -79,19 +74,6 @@ public class UserService {
 
 	public List<Role> getRoles() {
 		return Arrays.asList(Role.values());
-	}
-
-	public List<VehicleTypeTO> getVehicleTypes() throws CustomException {
-		try {
-			return vehicleTypeDao.findAll().stream().map((vehicleTypeEntity) -> {
-				System.out.println(vehicleTypeEntity);
-				VehicleTypeTO vehicleTypeTO = new VehicleTypeTO();
-				BeanUtils.copyProperties(vehicleTypeEntity, vehicleTypeTO);
-				return vehicleTypeTO;
-			}).toList();
-		} catch (DataAccessException e) {
-			throw CustomException.INTERNAL_SERVER_ERRROR;
-		}
 	}
 
 	public void checkIfUserIdExist(String userId) throws CustomException {

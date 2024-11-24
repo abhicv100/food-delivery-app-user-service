@@ -14,7 +14,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import com.bits.pilani.user_service.security.JwtAuthHandlerInterceptor;
 import com.bits.pilani.user_service.service.AuthService;
 import com.bits.pilani.user_service.to.UsernamePasswordTO;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,17 +26,10 @@ public class AuthControllerTest {
 	
 	@MockBean
 	AuthService authService;
-	
-	@MockBean
-	JwtAuthHandlerInterceptor jwtInterceptor;
-	
+		
 	@Autowired
 	ObjectMapper mapper;
 	
-	@BeforeEach
-	void before() throws Exception {
-		when(jwtInterceptor.preHandle(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(true);
-	}
 	
 	@Order(1)
 	@Test
@@ -50,7 +42,7 @@ public class AuthControllerTest {
 		
 		String requestBody = mapper.writeValueAsString(usernamePasswordTO);
 		
-		mockMvc.perform(MockMvcRequestBuilders.get("/auth")
+		mockMvc.perform(MockMvcRequestBuilders.get("/auth/token")
 							.contentType(MediaType.APPLICATION_JSON)
 							.content(requestBody)
 							).andExpect(MockMvcResultMatchers.status().isOk());
